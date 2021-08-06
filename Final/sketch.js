@@ -1,76 +1,43 @@
 /* Zoom Background 3000 
 Workshop by aiXdesign Creative Kitchen @ SAAI 
-held by Tom-Lucas Säger 🌍 tlsaeger.de 🐦 @t00may  */
+held by Tom-Lucas Säger 🌍 https://tlsaeger.de 🐦 @t00may  */
 
-/* In diesem Beispiel erforschen wir die Möglichkeiten von
-Teachable Machine: https://teachablemachine.withgoogle.com/
-Mit dieser Anwendung können wir sehr einfach unser eigenes 
-ML-Model trainieren. Erstellt dafür ein neues Image Project
-mit zwei Klassen auf der Webseite. In meinem Beispiel heißen die  
-Klassen Tommy und BRB für Be right back. Wir machen für die Klasse 
-Tommy, bitte mit eurem Namen tauschen. Fotos über die Webcam 
-von euch selber. Für die Klasse BRB geht ihr aus dem Bild und
-mach auch noch ein paar Bilder. Dann klicken wir auf Train 
-und danach auf Export Model -> Upload. 
-Daraus bekommen wir einen Link den wir hier gleich brauchen.
-Wenn Teachable Machine (TM) diese Klassen später erkennt, 
-soll p5.js uns ein bestimmtes Bild über den Canvas legen.
-Siehe Video auf https://github.com/tlsaeger/ml5-workshop-hawhamburg#teachable-machine-videocall--0301
-*/
+/* In this example we will, build a Zoom Background which reacts on poses we make in front of the camera. If for example we put our hand in front of our mouth the background will change to »You’re on mute!« For the training of our recognition-mode  we use Teachable Machine by Google (https://teachablemachine.withgoogle.com/). We can use this application, to easily train our own ML-model using a graphical interface. 
+Create a new »Image Project« with two classes on the website. We gonna call one »Empty« and one »Mute«. We capture some pictures using the webcam, in the »mute«-class we take picture of ourself holding one finger in front of our mouth making a psst-pose. The »Empty«-Class gets feed with pictures of you just sitting, or you out of the frame. After we captured a big chunk of training data, press »Train«, then test your model and if you are happy »Export Model« → »Upload«. This will create a link, that we need later.*/
 
-/* Wir erstellen uns wieder ein paar Variablen, für unseren classifier, 
-unsere beiden Bilder und die URL die uns TM ausgibt. Hier muss noch 
-'model.json' hinzugefügt werden, damit ml5 auf die richtige Datei 
-zugreift.*/
-// Classifier Variable
+
+//We create a few variables, which we can use later on. Paste the link you obtained from Teachable Machine in the variable imageModelUrl
 let classifier;
-let brbImage;
-let tommyImage;
 let mute;
-let imageModelURL = 'https://teachablemachine.withgoogle.com/models/EQ1vdaXPs/' + 'model.json';
+let imageModelUrl = 'https://teachablemachine.withgoogle.com/models/LscBuPCNA/';
 
-/* Wir brauche außerdem noch ein paar Variablen für unser Video und 
-die Labels die wir später rausbekommen. */
+// A few more variables we use for the video and label*/
 let video;
 let flippedVideo;
 let label = "";
 
-/* Wir laden das Model, geben diesem unsere URL von TM mit, 
-heute lassen wir den Callback mal weg. Dann laden wir unsere beiden 
-Bilder, wenn TM die Klassen erkennt. Diese müssen wir natürlich erstellen. 
-Dafür können wir z.B. Photoshop nutzen. Am besten wählen wir die gleiche Größe wie unser Canvas also 640x480*/
+//We create our ml5 classifier and pass it the variable with the TM link + 'model.json' Then we can preload our images we want to overlay. 
+//You can make one yourself or download free pngs at https://www.stickpng.com/
 function preload() {
-  classifier = ml5.imageClassifier(imageModelURL);
-  brbImage = loadImage('img/brb.png');
-  tommyImage = loadImage('img/tommy.png');
+  classifier = ml5.imageClassifier(imageModelUrl + 'model.json');
   mute = loadImage('img/mute.png');
 }
-/* Im Setup erstellen wir unseren Canvas und laden über createCapture(VIDEO) die Webcam. 
-Wir passen die größe mit video.size() an und hiden das ganze dann wieder.  
-Als letztes starten wir unsere classifVideo() Funktion. */
+//We create our canvas in the setup() function and load the webcam. We need to set the size of our video and hide it then. 
+//We will redraw the video later. Then we call classifyVideo().
 function setup() {
-  createCanvas(1280, 720);
+  createCanvas(640, 480);
   video = createCapture(VIDEO);
-  video.size(128, 96);
+  video.size(width,height);
   video.hide();
   classifyVideo();
 }
-/* In unser classifyVideo() Funktion flippen wir erstmals das Video.
-Dieses Mal müssen wir die Kamera etwas anders flippen, als gestern. Unsere Methode von gestern, 
-würde auch die Bilder flippen das wollen wir natürlich nicht.
-Ab jetzt arbeiten wir dann mit dem flippedVideo weiter.
-Wir schmeißen wieder unserern classifier an geben diesen unser flippedVideo und fangen 
-über den Callback gotResults die Ergebnisse ab.*/
+//In our classfiyVideo() function we flip the video, to make it easier to work with. Then we call classify on our classifier and pass in the video. Once the results are ready, the classifier will call the function gotResult()
 function classifyVideo() {
-  // background(0, 255, 0);
   flippedVideo = ml5.flipImage(video);
   classifier.classify(flippedVideo, gotResult);
 }
 
-/*In unserem gotResults() Callback, definieren wir zu erst, 
-was bei einem Error passieren soll. Dann speichern wir uns wie in den Beispielen zuvor, 
-die results in die Varibale label und starten den Klassifizierungsprozess mit 
-der Funktion classfiyVideo() erneut.   */
+//In gotResult we first do some error handling, than we pass the results to our variable label.
 function gotResult(error, results) {
   // If there is an error
   if (error) {
@@ -84,31 +51,14 @@ function gotResult(error, results) {
   classifyVideo();
 }
 
-/* In Draw zeichnen wir das geflippte Video auf unseren Canvas. 
-Und führen die Funktion showGesture() aus diese definieren gleich und sie checkt, 
-welche Klasse gerade von TM ausgegeben wir und zeichnet dann das ensprechende Bild.    */
+// In the draw loop we draw the video and call the function showGesture, which will generate to overlay
 function draw() {
-  background(0,255,0);
-  // image(flippedVideo, 0, 0);
+  image(flippedVideo, 0, 0);
   showGesture();
 }
-
-/* Wie weiter oben beschrieben, checken wir mit dieser Funktion, 
-welche Klasse TM erkennt, über unser Label, welches wir in der gotResults() Funktion
-erstellt haben. Ist die Klasse "Tommy", zeichne das Bild tommyImage, 
-ist die Klasse "BRB" zeichne das brbImage. */
+// Now we check which class was detected by Teachable Machine, if the class is "Mute" we draw our image if it is "Empty" we draw nothing. 
 function showGesture(){
-  if(label == "Tommy"){
-    image(tommyImage,0,0, width, height);
+  if(label == "Mute"){
+    image(mute,0,0, width, height);
   }
-  else if(label == "BRB"){
-    image(brbImage,0,0, width,height);
-  }
-  else if(label == "On Mute"){
-    image(mute,0,0, width,height);
-  }
-  else if(label == "Can't See"){
-    image(tommyImage,0,0, width,height);
-  }
-
 }
