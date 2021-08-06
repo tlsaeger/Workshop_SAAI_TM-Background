@@ -2,7 +2,7 @@
 Workshop by aiXdesign Creative Kitchen @ SAAI 
 held by Tom-Lucas Säger 🌍 https://tlsaeger.de 🐦 @t00may  */
 
-/* In this example we will, build a Zoom Background which reacts on poses we make in front of the camera. If for example we put our hand in front of our mouth the background will change to »You’re on mute!« For the training of our recognition-mode  we use Teachable Machine by Google (https://teachablemachine.withgoogle.com/). We can use this application, to easily train our own ML-model using a graphical interface. 
+/* In this example we will, build a Zoom Background which reacts on poses we make in front of the camera. If for example we put our hand in front of our mouth the background will change to »You’re on mute!« For the training of our recognition-mode we use Teachable Machine by Google (https://teachablemachine.withgoogle.com/). We can use this application, to easily train our own ML-model using a graphical interface. 
 Create a new »Image Project« with two classes on the website. We gonna call one »Empty« and one »Mute«. We capture some pictures using the webcam, in the »mute«-class we take picture of ourself holding one finger in front of our mouth making a psst-pose. The »Empty«-Class gets feed with pictures of you just sitting, or you out of the frame. After we captured a big chunk of training data, press »Train«, then test your model and if you are happy »Export Model« → »Upload«. This will create a link, that we need later.*/
 
 
