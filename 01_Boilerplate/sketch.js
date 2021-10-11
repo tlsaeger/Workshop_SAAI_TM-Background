@@ -1,5 +1,5 @@
 /* Zoom Background 3000 
-Workshop by aiXdesign Creative Kitchen @ SAAI 
+Workshop »AI X Design – Rage against the machine?« @ HTW Berlin 
 held by Tom-Lucas Säger 🌍 tlsaeger.de 🐦 @t00may  */
 
 function setup() {
